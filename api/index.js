@@ -5,6 +5,7 @@ import { open } from 'sqlite';
 import { v4 as uuidv4 } from 'uuid';
 
 const app = express();
+const apiRouter = express.Router();
 
 // CORS configuration for production
 const corsOptions = {
@@ -92,7 +93,7 @@ initializeDatabase().catch(console.error);
 // API Routes
 
 // Get all expenses
-app.get('/expenses', async (req, res) => {
+apiRouter.get('/expenses', async (req, res) => {
   try {
     const expenses = await db.all('SELECT * FROM expenses ORDER BY date DESC');
     res.json(expenses.map(expense => ({
@@ -105,7 +106,7 @@ app.get('/expenses', async (req, res) => {
 });
 
 // Add new expense
-app.post('/expenses', async (req, res) => {
+apiRouter.post('/expenses', async (req, res) => {
   try {
     const { type, amount, category, description, date, paymentMode, splitInfo } = req.body;
     const id = uuidv4();
@@ -126,7 +127,7 @@ app.post('/expenses', async (req, res) => {
 });
 
 // Update expense
-app.put('/expenses/:id', async (req, res) => {
+apiRouter.put('/expenses/:id', async (req, res) => {
   try {
     const { id } = req.params;
     const { type, amount, category, description, date, paymentMode, splitInfo } = req.body;
@@ -151,7 +152,7 @@ app.put('/expenses/:id', async (req, res) => {
 });
 
 // Delete expense
-app.delete('/expenses/:id', async (req, res) => {
+apiRouter.delete('/expenses/:id', async (req, res) => {
   try {
     const { id } = req.params;
     const result = await db.run('DELETE FROM expenses WHERE id = ?', [id]);
@@ -167,7 +168,7 @@ app.delete('/expenses/:id', async (req, res) => {
 });
 
 // Shared Events - Simple link-based system
-app.get('/shared-events', async (req, res) => {
+apiRouter.get('/shared-events', async (req, res) => {
   try {
     const events = await db.all(`
       SELECT 
@@ -186,7 +187,7 @@ app.get('/shared-events', async (req, res) => {
   }
 });
 
-app.post('/shared-events', async (req, res) => {
+apiRouter.post('/shared-events', async (req, res) => {
   try {
     const { name, description } = req.body;
     const eventId = uuidv4();
@@ -205,7 +206,7 @@ app.post('/shared-events', async (req, res) => {
 });
 
 // Get event by share code
-app.get('/shared-events/:shareCode', async (req, res) => {
+apiRouter.get('/shared-events/:shareCode', async (req, res) => {
   try {
     const { shareCode } = req.params;
     
@@ -234,7 +235,7 @@ app.get('/shared-events/:shareCode', async (req, res) => {
 });
 
 // Add expense to shared event
-app.post('/shared-events/:shareCode/expenses', async (req, res) => {
+apiRouter.post('/shared-events/:shareCode/expenses', async (req, res) => {
   try {
     const { shareCode } = req.params;
     const { description, amount, paidBy, splitBetween, date, category, paymentMode, createdBy } = req.body;
@@ -263,7 +264,7 @@ app.post('/shared-events/:shareCode/expenses', async (req, res) => {
 });
 
 // Get expenses for shared event
-app.get('/shared-events/:shareCode/expenses', async (req, res) => {
+apiRouter.get('/shared-events/:shareCode/expenses', async (req, res) => {
   try {
     const { shareCode } = req.params;
     
@@ -288,13 +289,16 @@ app.get('/shared-events/:shareCode/expenses', async (req, res) => {
 });
 
 // Health check
-app.get('/health', (req, res) => {
+apiRouter.get('/health', (req, res) => {
   res.json({ status: 'OK', message: 'Server is running' });
 });
 
-// Handle all other routes
-app.all('*', (req, res) => {
-  res.status(404).json({ error: 'Route not found' });
+// Mount the router to handle all API requests
+app.use('/api', apiRouter);
+
+// Handle root path for basic info
+app.get('/', (req, res) => {
+  res.json({ message: 'Welcome to the Expenso API' });
 });
 
 // Export for Vercel
