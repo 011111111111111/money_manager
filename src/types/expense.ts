@@ -1,4 +1,3 @@
-
 export interface Expense {
   id: string;
   type: 'income' | 'expense';
@@ -13,8 +12,9 @@ export interface Expense {
   };
 }
 
-export interface GroupExpense {
+export interface SharedExpense {
   id: string;
+  eventId: string;
   description: string;
   amount: number;
   paidBy: string;
@@ -22,27 +22,25 @@ export interface GroupExpense {
   date: string;
   category: string;
   paymentMode: string;
-  // New field to track multiple payers
-  multiplePayments?: {
-    memberId: string;
-    amount: number;
-    paymentMode: string;
-  }[];
+  createdBy: string;
+  createdAt: string;
 }
 
-export interface Member {
-  id: string;
-  name: string;
-  email?: string;
-}
-
-export interface GroupEvent {
+export interface SharedEvent {
   id: string;
   name: string;
   description?: string;
-  members: Member[];
-  expenses: GroupExpense[];
+  shareCode: string;
+  isActive: boolean;
+  expenseCount?: number;
+  totalAmount?: number;
+  expenses?: SharedExpense[];
   createdAt: string;
+}
+
+export interface CreateSharedEventRequest {
+  name: string;
+  description?: string;
 }
 
 export interface Settlement {

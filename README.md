@@ -1,73 +1,202 @@
-# Welcome to your Lovable project
+# 💰 Expenso Together - Shared Expense Tracker
 
-## Project info
+A modern expense tracking app built with React, TypeScript, and Node.js that allows you to track personal expenses and create shared events for group expenses.
 
-**URL**: https://lovable.dev/projects/74020e0c-f071-4ed1-9e90-44d8e8a68ead
+## ✨ Features
 
-## How can I edit this code?
+- **Personal Expense Tracking**: Track your daily expenses with categories and payment modes
+- **Shared Events**: Create events and share links with friends to track group expenses
+- **Real-time Updates**: See expenses update in real-time across all participants
+- **Beautiful UI**: Modern design with shadcn/ui components
+- **Mobile Responsive**: Works perfectly on all devices
+- **No Registration Required**: Simple link-based sharing system
 
-There are several ways of editing your application.
+## 🚀 Quick Start
 
-**Use Lovable**
+### Local Development
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/74020e0c-f071-4ed1-9e90-44d8e8a68ead) and start prompting.
+1. **Clone and install dependencies**:
+   ```bash
+   git clone <your-repo-url>
+   cd expenso-together-now
+   npm install
+   cd backend && npm install && cd ..
+   ```
 
-Changes made via Lovable will be committed automatically to this repo.
+2. **Start the development server**:
+   ```bash
+   npm run dev
+   ```
 
-**Use your preferred IDE**
+3. **Open your browser**:
+   - Frontend: http://localhost:5173
+   - Backend API: http://localhost:3001
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+### Deploy to Vercel (Recommended)
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+1. **Push to GitHub**:
+   ```bash
+   git add .
+   git commit -m "Prepare for deployment"
+   git push origin main
+   ```
 
-Follow these steps:
+2. **Deploy to Vercel**:
+   - Go to [Vercel.com](https://vercel.com)
+   - Import your GitHub repository
+   - Configure:
+     - Framework: Vite
+     - Root Directory: `expenso-together-now`
+     - Build Command: `npm run build`
+     - Output Directory: `dist`
+   - Deploy!
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+3. **Your app will be live at**: `https://your-app.vercel.app`
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+📖 **Detailed deployment guide**: [VERCEL_DEPLOYMENT.md](./VERCEL_DEPLOYMENT.md)
 
-# Step 3: Install the necessary dependencies.
-npm i
+## 🏗️ Architecture
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
+### Frontend
+- **React 18** with TypeScript
+- **Vite** for fast development and building
+- **React Router** for navigation
+- **React Query** for data fetching
+- **shadcn/ui** for beautiful components
+- **Tailwind CSS** for styling
+
+### Backend
+- **Node.js** with Express
+- **SQLite** database (with cloud database options)
+- **RESTful API** design
+- **CORS** enabled for cross-origin requests
+
+### Database Schema
+```sql
+-- Personal expenses
+expenses (id, type, amount, category, description, date, paymentMode, splitInfo)
+
+-- Shared events
+shared_events (id, name, description, shareCode, isActive, createdAt)
+
+-- Shared expenses
+shared_expenses (id, eventId, description, amount, paidBy, splitBetween, date, category, paymentMode, createdBy)
 ```
 
-**Edit a file directly in GitHub**
+## 📱 How to Use
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+### Personal Expenses
+1. Add expenses with categories (Food, Transport, Entertainment, etc.)
+2. Choose payment mode (Cash, Card, UPI, etc.)
+3. View expense history and charts
+4. Track your spending patterns
 
-**Use GitHub Codespaces**
+### Shared Events
+1. Create a new shared event
+2. Get a unique share code (e.g., ABC123)
+3. Share the link: `https://your-app.vercel.app/shared/ABC123`
+4. Anyone with the link can add expenses
+5. View all expenses and splits in real-time
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+## 🔧 API Endpoints
 
-## What technologies are used for this project?
+### Personal Expenses
+- `GET /api/expenses` - Get all expenses
+- `POST /api/expenses` - Add new expense
+- `PUT /api/expenses/:id` - Update expense
+- `DELETE /api/expenses/:id` - Delete expense
 
-This project is built with:
+### Shared Events
+- `GET /api/shared-events` - Get all events
+- `POST /api/shared-events` - Create new event
+- `GET /api/shared-events/:shareCode` - Get event by code
+- `POST /api/shared-events/:shareCode/expenses` - Add expense to event
+- `GET /api/shared-events/:shareCode/expenses` - Get event expenses
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+### Health Check
+- `GET /api/health` - Server status
 
-## How can I deploy this project?
+## 🗄️ Database Options
 
-Simply open [Lovable](https://lovable.dev/projects/74020e0c-f071-4ed1-9e90-44d8e8a68ead) and click on Share -> Publish.
+### Current: SQLite (Vercel)
+- Stored in `/tmp` directory
+- Data may be cleared occasionally (serverless limitation)
+- Good for testing and small apps
 
-## Can I connect a custom domain to my Lovable project?
+### Recommended: Cloud Database
+For production apps, consider:
+- **Supabase** (free PostgreSQL)
+- **PlanetScale** (free MySQL)
+- **MongoDB Atlas** (free MongoDB)
 
-Yes, you can!
+## 🛠️ Development
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+### Scripts
+```bash
+npm run dev          # Start both frontend and backend
+npm run dev:frontend # Start only frontend
+npm run dev:backend  # Start only backend
+npm run build        # Build for production
+npm run preview      # Preview production build
+```
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+### Project Structure
+```
+expenso-together-now/
+├── src/
+│   ├── components/     # React components
+│   ├── hooks/         # Custom React hooks
+│   ├── pages/         # Page components
+│   ├── services/      # API services
+│   └── types/         # TypeScript types
+├── backend/
+│   └── server.js      # Express server
+├── public/            # Static assets
+└── dist/              # Build output
+```
+
+## 🎨 UI Components
+
+Built with [shadcn/ui](https://ui.shadcn.com/) components:
+- Cards, Buttons, Forms
+- Modals, Dropdowns, Tabs
+- Charts, Tables, Badges
+- Toast notifications
+- Responsive design
+
+## 🔒 Security
+
+- CORS configured for production domains
+- Input validation on all endpoints
+- SQL injection protection with parameterized queries
+- No sensitive data stored in client-side storage
+
+## 🚀 Performance
+
+- React Query for efficient data caching
+- Vite for fast builds and HMR
+- Optimized bundle size
+- Lazy loading for routes
+- CDN-ready static assets
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Test thoroughly
+5. Submit a pull request
+
+## 📄 License
+
+MIT License - feel free to use this project for personal or commercial purposes.
+
+## 🆘 Support
+
+- **Issues**: Create an issue on GitHub
+- **Documentation**: Check the deployment guide
+- **Community**: Share your feedback and ideas
+
+---
+
+**🎯 Ready to track expenses together? Deploy your app and start sharing!**

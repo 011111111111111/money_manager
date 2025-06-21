@@ -1,5 +1,4 @@
-
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { PlusCircle, Calendar, TrendingUp, TrendingDown } from 'lucide-react';
@@ -7,40 +6,28 @@ import AddExpenseModal from './AddExpenseModal';
 import ExpenseList from './ExpenseList';
 import ExpenseChart from './ExpenseChart';
 import { Expense } from '@/types/expense';
+import { useExpenses } from '@/hooks/useExpenses';
 
 const PersonalTracker = () => {
-  const [expenses, setExpenses] = useState<Expense[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
-
-  // Load expenses from localStorage on component mount
-  useEffect(() => {
-    const storedExpenses = localStorage.getItem('personal-expenses');
-    if (storedExpenses) {
-      setExpenses(JSON.parse(storedExpenses));
-    }
-  }, []);
-
-  // Save expenses to localStorage whenever expenses change
-  useEffect(() => {
-    localStorage.setItem('personal-expenses', JSON.stringify(expenses));
-  }, [expenses]);
+  const { 
+    expenses, 
+    isLoading, 
+    error, 
+    createExpense, 
+    updateExpense, 
+    deleteExpense,
+    isCreating 
+  } = useExpenses();
 
   const addExpense = (expense: Omit<Expense, 'id'>) => {
-    const newExpense: Expense = {
-      ...expense,
-      id: Date.now().toString(),
-    };
-    setExpenses(prev => [newExpense, ...prev]);
-  };
-
-  const deleteExpense = (id: string) => {
-    setExpenses(prev => prev.filter(expense => expense.id !== id));
+    createExpense(expense);
+    setIsModalOpen(false);
   };
 
   const editExpense = (updatedExpense: Expense) => {
-    setExpenses(prev => prev.map(expense => 
-      expense.id === updatedExpense.id ? updatedExpense : expense
-    ));
+    const { id, ...expenseData } = updatedExpense;
+    updateExpense({ id, expense: expenseData });
   };
 
   // Calculate totals
@@ -53,6 +40,24 @@ const PersonalTracker = () => {
     .reduce((sum, e) => sum + e.amount, 0);
 
   const balance = totalIncome - totalExpense;
+
+  if (error) {
+    return (
+      <div className="space-y-6">
+        <Card className="bg-red-50 border-red-200">
+          <CardContent className="pt-6">
+            <div className="text-center">
+              <p className="text-red-800 font-medium">Error loading expenses</p>
+              <p className="text-red-600 text-sm mt-1">{error.message}</p>
+              <p className="text-red-600 text-sm mt-1">
+                Make sure the backend server is running on http://localhost:3001
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -108,7 +113,13 @@ const PersonalTracker = () => {
             <CardTitle>Expense Breakdown</CardTitle>
           </CardHeader>
           <CardContent>
-            <ExpenseChart expenses={expenses} />
+            {isLoading ? (
+              <div className="flex items-center justify-center h-64">
+                <div className="text-gray-500">Loading chart...</div>
+              </div>
+            ) : (
+              <ExpenseChart expenses={expenses} />
+            )}
           </CardContent>
         </Card>
 
@@ -121,9 +132,10 @@ const PersonalTracker = () => {
               onClick={() => setIsModalOpen(true)}
               className="w-full"
               size="lg"
+              disabled={isCreating}
             >
               <PlusCircle className="w-4 h-4 mr-2" />
-              Add New Transaction
+              {isCreating ? 'Adding...' : 'Add New Transaction'}
             </Button>
             <div className="text-sm text-gray-600">
               Total Transactions: {expenses.length}
@@ -138,11 +150,17 @@ const PersonalTracker = () => {
           <CardTitle>Recent Transactions</CardTitle>
         </CardHeader>
         <CardContent>
-          <ExpenseList 
-            expenses={expenses.slice(0, 10)} 
-            onDelete={deleteExpense}
-            onEdit={editExpense}
-          />
+          {isLoading ? (
+            <div className="flex items-center justify-center h-32">
+              <div className="text-gray-500">Loading expenses...</div>
+            </div>
+          ) : (
+            <ExpenseList 
+              expenses={expenses.slice(0, 10)} 
+              onDelete={deleteExpense}
+              onEdit={editExpense}
+            />
+          )}
         </CardContent>
       </Card>
 

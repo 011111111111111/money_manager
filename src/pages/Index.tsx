@@ -1,11 +1,11 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import PersonalTracker from '@/components/PersonalTracker';
 import GroupSplitter from '@/components/GroupSplitter';
-import { PlusCircle, Users, Receipt } from 'lucide-react';
+import SimpleSharedEventManager from '@/components/SimpleSharedEventManager';
+import { PlusCircle, Users, Receipt, Share2 } from 'lucide-react';
 
 const Index = () => {
   const [activeTab, setActiveTab] = useState('personal');
@@ -19,17 +19,21 @@ const Index = () => {
             Smart Expense Tracker
           </h1>
           <p className="text-lg text-gray-600">
-            Track personal expenses and split bills with friends
+            Track personal expenses and collaborate on shared expenses with friends
           </p>
         </div>
 
         {/* Main Content */}
         <div className="max-w-6xl mx-auto">
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="grid w-full grid-cols-2 mb-8">
+            <TabsList className="grid w-full grid-cols-3 mb-8">
               <TabsTrigger value="personal" className="flex items-center gap-2">
                 <Receipt className="w-4 h-4" />
-                Personal Tracker
+                Personal
+              </TabsTrigger>
+              <TabsTrigger value="shared" className="flex items-center gap-2">
+                <Share2 className="w-4 h-4" />
+                Shared Events
               </TabsTrigger>
               <TabsTrigger value="group" className="flex items-center gap-2">
                 <Users className="w-4 h-4" />
@@ -39,6 +43,10 @@ const Index = () => {
 
             <TabsContent value="personal" className="space-y-6">
               <PersonalTracker />
+            </TabsContent>
+
+            <TabsContent value="shared" className="space-y-6">
+              <SimpleSharedEventManager />
             </TabsContent>
 
             <TabsContent value="group" className="space-y-6">
