@@ -39,20 +39,6 @@ async function initializeDatabase() {
 
   // Create tables
   await db.exec(`
-    CREATE TABLE IF NOT EXISTS expenses (
-      id TEXT PRIMARY KEY,
-      type TEXT NOT NULL,
-      amount REAL NOT NULL,
-      category TEXT NOT NULL,
-      description TEXT NOT NULL,
-      date TEXT NOT NULL,
-      paymentMode TEXT NOT NULL,
-      splitInfo TEXT,
-      createdAt TEXT DEFAULT CURRENT_TIMESTAMP
-    )
-  `);
-
-  await db.exec(`
     CREATE TABLE IF NOT EXISTS shared_events (
       id TEXT PRIMARY KEY,
       name TEXT NOT NULL,
@@ -91,81 +77,6 @@ async function initializeDatabase() {
 initializeDatabase().catch(console.error);
 
 // API Routes
-
-// Get all expenses
-apiRouter.get('/expenses', async (req, res) => {
-  try {
-    const expenses = await db.all('SELECT * FROM expenses ORDER BY date DESC');
-    res.json(expenses.map(expense => ({
-      ...expense,
-      splitInfo: expense.splitInfo ? JSON.parse(expense.splitInfo) : undefined
-    })));
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-// Add new expense
-apiRouter.post('/expenses', async (req, res) => {
-  try {
-    const { type, amount, category, description, date, paymentMode, splitInfo } = req.body;
-    const id = uuidv4();
-    
-    await db.run(
-      'INSERT INTO expenses (id, type, amount, category, description, date, paymentMode, splitInfo) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
-      [id, type, amount, category, description, date, paymentMode, splitInfo ? JSON.stringify(splitInfo) : null]
-    );
-
-    const newExpense = await db.get('SELECT * FROM expenses WHERE id = ?', [id]);
-    res.status(201).json({
-      ...newExpense,
-      splitInfo: newExpense.splitInfo ? JSON.parse(newExpense.splitInfo) : undefined
-    });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-// Update expense
-apiRouter.put('/expenses/:id', async (req, res) => {
-  try {
-    const { id } = req.params;
-    const { type, amount, category, description, date, paymentMode, splitInfo } = req.body;
-    
-    await db.run(
-      'UPDATE expenses SET type = ?, amount = ?, category = ?, description = ?, date = ?, paymentMode = ?, splitInfo = ? WHERE id = ?',
-      [type, amount, category, description, date, paymentMode, splitInfo ? JSON.stringify(splitInfo) : null, id]
-    );
-
-    const updatedExpense = await db.get('SELECT * FROM expenses WHERE id = ?', [id]);
-    if (!updatedExpense) {
-      return res.status(404).json({ error: 'Expense not found' });
-    }
-
-    res.json({
-      ...updatedExpense,
-      splitInfo: updatedExpense.splitInfo ? JSON.parse(updatedExpense.splitInfo) : undefined
-    });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-// Delete expense
-apiRouter.delete('/expenses/:id', async (req, res) => {
-  try {
-    const { id } = req.params;
-    const result = await db.run('DELETE FROM expenses WHERE id = ?', [id]);
-    
-    if (result.changes === 0) {
-      return res.status(404).json({ error: 'Expense not found' });
-    }
-    
-    res.json({ message: 'Expense deleted successfully' });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
 
 // Shared Events - Simple link-based system
 apiRouter.get('/shared-events', async (req, res) => {

@@ -1,4 +1,4 @@
-import { Expense, SharedExpense, SharedEvent, CreateSharedEventRequest } from '@/types/expense';
+import { SharedExpense, SharedEvent, CreateSharedEventRequest } from '@/types/expense';
 
 // Determine API URL based on environment
 const isProduction = import.meta.env.PROD || window.location.hostname !== 'localhost';
@@ -16,18 +16,25 @@ export interface ApiResponse<T> {
 class ApiService {
   private async request<T>(
     endpoint: string,
-    options: RequestInit = {}
+    options: RequestInit = {},
+    userId?: string | null
   ): Promise<ApiResponse<T>> {
     try {
       const url = `${API_BASE_URL}${endpoint}`;
       console.log('Making request to:', url);
       
+      const headers: HeadersInit = {
+        'Content-Type': 'application/json',
+        ...options.headers,
+      };
+
+      if (userId) {
+        headers['X-User-ID'] = userId;
+      }
+      
       const response = await fetch(url, {
-        headers: {
-          'Content-Type': 'application/json',
-          ...options.headers,
-        },
         ...options,
+        headers,
       });
 
       if (!response.ok) {
@@ -41,31 +48,6 @@ class ApiService {
       console.error('API Error:', error);
       return { error: error instanceof Error ? error.message : 'Unknown error' };
     }
-  }
-
-  // Personal Expenses
-  async getExpenses() {
-    return this.request<Expense[]>('/expenses');
-  }
-
-  async createExpense(expense: Omit<Expense, 'id'>) {
-    return this.request<Expense>('/expenses', {
-      method: 'POST',
-      body: JSON.stringify(expense),
-    });
-  }
-
-  async updateExpense(id: string, expense: Partial<Expense>) {
-    return this.request<Expense>(`/expenses/${id}`, {
-      method: 'PUT',
-      body: JSON.stringify(expense),
-    });
-  }
-
-  async deleteExpense(id: string) {
-    return this.request<{ message: string }>(`/expenses/${id}`, {
-      method: 'DELETE',
-    });
   }
 
   // Shared Events - Simple link-based system

@@ -1,57 +1,52 @@
-# 💰 Expenso Together - Shared Expense Tracker
+# �� Expenso Together - A Shared Expense Tracker
 
-A modern expense tracking app built with React, TypeScript, and Node.js that allows you to track personal expenses and create shared events for group expenses.
+A modern, simple, and privacy-focused app for tracking group expenses. Create an event, share the link, and start adding expenses with friends—no sign-up required.
 
 ## ✨ Features
 
-- **Personal Expense Tracking**: Track your daily expenses with categories and payment modes
-- **Shared Events**: Create events and share links with friends to track group expenses
-- **Real-time Updates**: See expenses update in real-time across all participants
-- **Beautiful UI**: Modern design with shadcn/ui components
-- **Mobile Responsive**: Works perfectly on all devices
-- **No Registration Required**: Simple link-based sharing system
+- **Simplified Interface**: A clean UI focused entirely on shared events.
+- **Link-Based Sharing**: Create an event and share a unique link. No accounts or logins needed.
+- **Real-time Updates**: See new expenses from friends update in real-time.
+- **Mobile Responsive**: Works perfectly on desktop, tablets, and phones.
+- **Beautiful UI**: Built with modern shadcn/ui components.
+- **Deployable**: Get your own instance running on Vercel in minutes.
 
 ## 🚀 Quick Start
 
 ### Local Development
 
-1. **Clone and install dependencies**:
-   ```bash
-   git clone <your-repo-url>
-   cd expenso-together-now
-   npm install
-   cd backend && npm install && cd ..
-   ```
+1.  **Clone and install dependencies**:
+    ```bash
+    git clone <your-repo-url>
+    cd expenso-together-now
+    npm install
+    ```
 
-2. **Start the development server**:
-   ```bash
-   npm run dev
-   ```
+2.  **Start the development server**:
+    ```bash
+    npm run dev
+    ```
 
-3. **Open your browser**:
-   - Frontend: http://localhost:5173
-   - Backend API: http://localhost:3001
+3.  **Open your browser**:
+    -   Frontend: `http://localhost:5173`
+    -   Backend API: `http://localhost:3001` (for local dev)
 
 ### Deploy to Vercel (Recommended)
 
-1. **Push to GitHub**:
-   ```bash
-   git add .
-   git commit -m "Prepare for deployment"
-   git push origin main
-   ```
+1.  **Push to GitHub**:
+    ```bash
+    git add .
+    git commit -m "Ready for initial deployment"
+    git push origin main
+    ```
 
-2. **Deploy to Vercel**:
-   - Go to [Vercel.com](https://vercel.com)
-   - Import your GitHub repository
-   - Configure:
-     - Framework: Vite
-     - Root Directory: `expenso-together-now`
-     - Build Command: `npm run build`
-     - Output Directory: `dist`
-   - Deploy!
+2.  **Deploy from Vercel**:
+    -   Go to [Vercel.com](https://vercel.com) and import your GitHub repository.
+    -   Use the **Vite** framework preset.
+    -   Set the Root Directory to `expenso-together-now` if needed.
+    -   Deploy!
 
-3. **Your app will be live at**: `https://your-app.vercel.app`
+3.  **Your app will be live at**: `https://your-app.vercel.app`
 
 📖 **Detailed deployment guide**: [VERCEL_DEPLOYMENT.md](./VERCEL_DEPLOYMENT.md)
 
@@ -66,45 +61,28 @@ A modern expense tracking app built with React, TypeScript, and Node.js that all
 - **Tailwind CSS** for styling
 
 ### Backend
-- **Node.js** with Express
-- **SQLite** database (with cloud database options)
+- **Node.js** with Express (running as a Vercel Serverless Function)
+- **SQLite** (for Vercel's temporary storage) or **Postgres** (for permanent storage)
 - **RESTful API** design
-- **CORS** enabled for cross-origin requests
 
 ### Database Schema
 ```sql
--- Personal expenses
-expenses (id, type, amount, category, description, date, paymentMode, splitInfo)
-
 -- Shared events
 shared_events (id, name, description, shareCode, isActive, createdAt)
 
--- Shared expenses
+-- Expenses within a shared event
 shared_expenses (id, eventId, description, amount, paidBy, splitBetween, date, category, paymentMode, createdBy)
 ```
 
 ## 📱 How to Use
 
-### Personal Expenses
-1. Add expenses with categories (Food, Transport, Entertainment, etc.)
-2. Choose payment mode (Cash, Card, UPI, etc.)
-3. View expense history and charts
-4. Track your spending patterns
-
-### Shared Events
-1. Create a new shared event
-2. Get a unique share code (e.g., ABC123)
-3. Share the link: `https://your-app.vercel.app/shared/ABC123`
-4. Anyone with the link can add expenses
-5. View all expenses and splits in real-time
+1.  Click **"Create New Event"**.
+2.  Give your event a name (e.g., "Road Trip" or "Apartment Bills").
+3.  A unique shareable link will be created.
+4.  Share the link with your friends.
+5.  Anyone with the link can view the event and add new expenses.
 
 ## 🔧 API Endpoints
-
-### Personal Expenses
-- `GET /api/expenses` - Get all expenses
-- `POST /api/expenses` - Add new expense
-- `PUT /api/expenses/:id` - Update expense
-- `DELETE /api/expenses/:id` - Delete expense
 
 ### Shared Events
 - `GET /api/shared-events` - Get all events
@@ -118,84 +96,48 @@ shared_expenses (id, eventId, description, amount, paidBy, splitBetween, date, c
 
 ## 🗄️ Database Options
 
-### Current: SQLite (Vercel)
-- Stored in `/tmp` directory
-- Data may be cleared occasionally (serverless limitation)
-- Good for testing and small apps
+### Current: SQLite (Vercel's Temporary Storage)
+- The default setup uses a temporary SQLite file.
+- **Data will be deleted after a period of inactivity.**
+- Good for testing and short-term events.
 
-### Recommended: Cloud Database
-For production apps, consider:
-- **Supabase** (free PostgreSQL)
-- **PlanetScale** (free MySQL)
-- **MongoDB Atlas** (free MongoDB)
+### Recommended: Vercel Postgres (Permanent Storage)
+For permanent data that is never lost, you can connect a free Vercel Postgres database in the "Storage" tab of your project's dashboard.
 
 ## 🛠️ Development
 
 ### Scripts
 ```bash
-npm run dev          # Start both frontend and backend
-npm run dev:frontend # Start only frontend
-npm run dev:backend  # Start only backend
+npm run dev          # Start both frontend and backend for local development
 npm run build        # Build for production
-npm run preview      # Preview production build
+npm run preview      # Preview production build locally
 ```
 
 ### Project Structure
 ```
 expenso-together-now/
+├── api/
+│   └── index.js       # Vercel serverless function (Backend)
 ├── src/
-│   ├── components/     # React components
+│   ├── components/    # React components
 │   ├── hooks/         # Custom React hooks
 │   ├── pages/         # Page components
-│   ├── services/      # API services
-│   └── types/         # TypeScript types
-├── backend/
-│   └── server.js      # Express server
+│   └── services/      # API services
 ├── public/            # Static assets
 └── dist/              # Build output
 ```
 
-## 🎨 UI Components
-
-Built with [shadcn/ui](https://ui.shadcn.com/) components:
-- Cards, Buttons, Forms
-- Modals, Dropdowns, Tabs
-- Charts, Tables, Badges
-- Toast notifications
-- Responsive design
-
-## 🔒 Security
-
-- CORS configured for production domains
-- Input validation on all endpoints
-- SQL injection protection with parameterized queries
-- No sensitive data stored in client-side storage
-
-## 🚀 Performance
-
-- React Query for efficient data caching
-- Vite for fast builds and HMR
-- Optimized bundle size
-- Lazy loading for routes
-- CDN-ready static assets
-
 ## 🤝 Contributing
 
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Test thoroughly
-5. Submit a pull request
+1.  Fork the repository
+2.  Create a feature branch
+3.  Make your changes
+4.  Test thoroughly
+5.  Submit a pull request
 
 ## 📄 License
 
 MIT License - feel free to use this project for personal or commercial purposes.
-
-## 🆘 Support
-
-- **Issues**: Create an issue on GitHub
-- **Documentation**: Check the deployment guide
-- **Community**: Share your feedback and ideas
 
 ---
 

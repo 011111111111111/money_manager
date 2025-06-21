@@ -26,7 +26,7 @@ export interface SharedExpense {
   createdAt: string;
 }
 
-export interface SharedEvent {
+export type SharedEvent = {
   id: string;
   name: string;
   description?: string;
