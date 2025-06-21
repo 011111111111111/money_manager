@@ -1,8 +1,12 @@
 import { Expense, SharedExpense, SharedEvent, CreateSharedEventRequest } from '@/types/expense';
 
-// Use environment variable for API URL, fallback to localhost for development
-// For Vercel deployment, both frontend and backend are on the same domain
-const API_BASE_URL = import.meta.env.VITE_API_URL || (import.meta.env.PROD ? '/api' : 'http://localhost:3001/api');
+// Determine API URL based on environment
+const isProduction = import.meta.env.PROD || window.location.hostname !== 'localhost';
+const API_BASE_URL = isProduction ? '/api' : 'http://localhost:3001/api';
+
+console.log('API Base URL:', API_BASE_URL);
+console.log('Environment:', import.meta.env.MODE);
+console.log('Is Production:', isProduction);
 
 export interface ApiResponse<T> {
   data?: T;
@@ -15,7 +19,10 @@ class ApiService {
     options: RequestInit = {}
   ): Promise<ApiResponse<T>> {
     try {
-      const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+      const url = `${API_BASE_URL}${endpoint}`;
+      console.log('Making request to:', url);
+      
+      const response = await fetch(url, {
         headers: {
           'Content-Type': 'application/json',
           ...options.headers,
@@ -31,6 +38,7 @@ class ApiService {
       const data = await response.json();
       return { data };
     } catch (error) {
+      console.error('API Error:', error);
       return { error: error instanceof Error ? error.message : 'Unknown error' };
     }
   }
